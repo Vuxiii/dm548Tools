@@ -13,7 +13,7 @@ public class Number{
     public static void main( String[] args ) {
 
         // System.out.println( intToTwos( -10 ) );
-
+        // System.out.println( Arit.binAdd( "0111", "0001" ) );
         // /**
         System.out.println( Integer.parseInt( "-1" ) );
         Conversion.initHexMap();
@@ -46,20 +46,10 @@ public class Number{
                     break;
             }
 
-            System.out.println( "\n\n\n====================================\n\n\n");
+            System.out.println( "\n\n\n=======================================\n\n\n");
         } while ( choice != 0 );
         //  */
         in.close();
-        // int num_decimal = args[0] ;
-        // String num_hex = intToHex( num_decimal );
-        // String num_bin = intToBinary( num_decimal );
-        // String bin_calc = showCalcBin( num_bin );
-        // String num_two = binToTwos( num_bin );
-        // System.out.println( "Integer\t\t" + num_decimal );
-        // System.out.println( "Hexidecimal\t" + num_hex );
-        // System.out.println( "Binary\t\t" + num_bin + "\t" + bin_calc + " = " + num_decimal );
-        // // System.out.println( "Binary\t\t" + Integer.toBinaryString( num_decimal ) );
-        // System.out.println( "Two's Comp\t" + num_two );
     }
     
     /**
@@ -67,10 +57,10 @@ public class Number{
      */
     public static void menu() {
         System.out.println( "The following options are available:" );
-        System.out.println( "0] Exit" );
+        System.out.println( "0] Exit\n" );
         System.out.println( "1] Make Variable" );
         System.out.println( "2] List Variables" );
-        System.out.println( "3] Alter Variable" );
+        System.out.println( "3] Edit Variable\n" );
         System.out.println( "4] Variable Math" );
         System.out.println( "5] Integer to Binary" );
 
@@ -226,12 +216,13 @@ public class Number{
                 Variable var1 = selectVariable();
                 System.out.println( "Enter the second Variable you would like to use for the addition:\n" );
                 Variable var2 = selectVariable();
-
-                if ( var1.type == var2.type ) {
+                boolean sameType = var1.type == var2.type;
+                boolean binAdd = ( (var1.type == Type.Binary || var1.type == Type.SignedBinary) && (var2.type == Type.Binary || var2.type == Type.SignedBinary) );
+                if ( sameType || binAdd ) {
                     int diff = Math.abs( var1.val.length() - var2.val.length() );
                     if ( var1.val.length() > var2.val.length() ) {
 
-                        System.out.println( " " + var1.val );
+                        System.out.println( "\n " + var1.val );
                         System.out.println( "+" + " ".repeat( diff ) + var2.val );
                     } else {
                         System.out.println( " " + var2.val );
@@ -239,10 +230,21 @@ public class Number{
                     }
                     
                     System.out.println( "-" + "-".repeat( Math.max( var1.val.length(), var2.val.length() ) ) );
+
+                    if ( binAdd )
+                        System.out.println( " " + Arit.binAdd( var1, var2, false ) );
+                    else if ( var1.type == Type.Integer )
+                        System.out.println( " " + (Integer.parseInt( var1.val ) + Integer.parseInt( var2.val )) );
+                    else if ( var1.type == Type.Double )
+                        System.out.println( " " + (Double.parseDouble( var1.val ) + Double.parseDouble( var2.val )) );
                 }
             } break;
             case 3: {
-                // booths();
+                System.out.println( "Booth's Algorithm\nEnter Binary number for M:\n" );
+                Variable M = selectVariable();
+                System.out.println( "Enter Binary number for Q:\n" );
+                Variable Q = selectVariable();
+                Arit.booths( M, Q );
             } break;
             case 4: {
                 // Display All conversions

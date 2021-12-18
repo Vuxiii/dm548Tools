@@ -77,10 +77,22 @@ public class Conversion {
 
 
     public static String intToBinary( String n ) {
-        String bin = Integer.toBinaryString( Integer.parseInt( n ) );
-        while ( bin.length() % 4 != 0 ) {
-            bin = "0" + bin;
+        int val = Integer.parseInt( n );
+        String bin = Integer.toBinaryString( val );
+        if ( val < 0 ) {
+            int bits = 0;
+            while ( Math.pow( 2, bits ) <= Math.abs( val ) ) bits++;
+
+            bin = bin.substring( bin.length() - bits - 1 );
         }
+
+        int size = bin.length();
+
+        while ( size % 4 != 0 ) ++size;
+
+        bin = Arit.binSignExtend( bin, size, val < 0 );
+
+        
         // if ( bin.length() > 4 ) {
         //     String bCopy = bin;
         //     bin = "";
@@ -137,6 +149,7 @@ public class Conversion {
         if ( sign == -1 )
             dou = dou.substring( 1 );
         
+        return significand;
         
     }
 
