@@ -18,7 +18,19 @@ public class Variable {
     }
 
     public String toString() {
-        return name + " = " + val + " [" + type + "]";
+        String s = name + " = ";
+        if ( type == Type.IEEE ) {
+            s += val.charAt(0) + " ";
+            s += val.substring( 1, 9 ) + " ";
+            for ( int i = 9; i < 31; i = i + 2 )
+                s += val.substring( i, i + 2 ) + " ";
+            s += val.charAt( val.length() - 1 );
+        } else if ( type == Type.Hex )
+            s = "0x" + val.toUpperCase();
+        else 
+            s += val;
+        return s + " [" + type + "]";
+        // return name + " = " + val + " [" + type + "]";
     }
 
     /**

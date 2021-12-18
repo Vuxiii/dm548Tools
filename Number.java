@@ -9,14 +9,14 @@ public class Number{
 
     public static Map< String, Variable > variables = new HashMap<>();
 
-    public static Map<Character, String> hexMap = new HashMap<>();
+    
     public static void main( String[] args ) {
 
         // System.out.println( intToTwos( -10 ) );
 
         // /**
-
-        initHexMap();
+        System.out.println( Integer.parseInt( "-1" ) );
+        Conversion.initHexMap();
         int choice = 0;
         do {
             menu();
@@ -50,7 +50,7 @@ public class Number{
         } while ( choice != 0 );
         //  */
         in.close();
-        // int num_decimal = Integer.parseInt( args[0] );
+        // int num_decimal = args[0] ;
         // String num_hex = intToHex( num_decimal );
         // String num_bin = intToBinary( num_decimal );
         // String bin_calc = showCalcBin( num_bin );
@@ -94,8 +94,6 @@ public class Number{
         
         System.out.print( "Enter your " + type + ":\n> " );
         String value = in.nextLine();
-        if ( type == Type.Hex && !value.startsWith("0x") )
-            value = "0x" + value.toUpperCase();
         variables.put( name, new Variable( name, value, type ) );
         System.out.println( "Made variable:\n" + variables.get( name ).toString() );
     }
@@ -257,6 +255,8 @@ public class Number{
                     System.out.println( var.name + " = " + convertVariable( var, Type.Hex ) + " [" + Type.Hex + "]" );
                 if ( var.type != Type.Integer )
                     System.out.println( var.name + " = " + convertVariable( var, Type.Integer ) + " [" + Type.Integer + "]" );
+                if ( var.type != Type.Double )
+                    System.out.println( var.name + " = " + convertVariable( var, Type.Double ) + " [" + Type.Double + "]" );
                 if ( var.type != Type.Binary )
                     System.out.println( var.name + " = " + convertVariable( var, Type.Binary ) + " [" + Type.Binary + "]" );
                 if ( var.type != Type.SignedBinary )
@@ -273,30 +273,41 @@ public class Number{
     public static String convertVariable( Variable var, Type targetType ) {
         // System.out.println( "From\t" + var.type + "\nTo\t" + targetType );
         if ( var.type == Type.Integer ) {
-            if ( targetType == Type.Binary )                return intToBinary( Integer.parseInt( var.val ) );
-            else if ( targetType == Type.SignedBinary )     return (Integer.parseInt( var.val ) < 0 ) ? intToBinary( Integer.parseInt( var.val ) ) : binToTwos( intToBinary( Integer.parseInt( var.val ) ) );
-            else if ( targetType == Type.Hex )              return intToHex( Integer.parseInt( var.val ) );
+            if ( targetType == Type.Double )                return "" + Double.parseDouble( var.val );
+            else if ( targetType == Type.Binary )           return Conversion.intToBinary( var.val  );
+            else if ( targetType == Type.SignedBinary )     return (Integer.parseInt( var.val )  < 0 ) ? Conversion.intToBinary( var.val  ) : Conversion.binToTwos( Conversion.intToBinary( var.val  ) );
+            else if ( targetType == Type.Hex )              return Conversion.intToHex( var.val  );
             else if ( targetType == Type.IEEE )             return null;
         } else if ( var.type == Type.Hex ) {
             if ( targetType == Type.Integer )               return "" + Long.parseLong( var.val.substring(2), 16 );
-            else if ( targetType == Type.Binary )           return hexToBinary( var.val );
-            else if ( targetType == Type.SignedBinary )     return binToTwos( hexToBinary( var.val ) );
+            else if ( targetType == Type.Double )           return "" + Double.parseDouble( "" + Long.parseLong( var.val.substring(2), 16 ) );
+            else if ( targetType == Type.Binary )           return Conversion.hexToBinary( var.val );
+            else if ( targetType == Type.SignedBinary )     return Conversion.binToTwos( Conversion.hexToBinary( var.val ) );
             else if ( targetType == Type.IEEE )             return null;
         } else if ( var.type == Type.Binary ) {
-            if ( targetType == Type.Integer )               return binToInt( var.val );
-            else if ( targetType == Type.SignedBinary )     return binToTwos( var.val );
-            else if ( targetType == Type.Hex )              return intToHex( Integer.parseInt( binToInt( var.val ) ) );
+            if ( targetType == Type.Integer )               return Conversion.binToInt( var.val );
+            else if ( targetType == Type.Double )           return "" + Double.parseDouble( Conversion.binToInt( var.val ) );
+            else if ( targetType == Type.SignedBinary )     return Conversion.binToTwos( var.val );
+            else if ( targetType == Type.Hex )              return Conversion.intToHex( Conversion.binToInt( var.val ) );
             else if ( targetType == Type.IEEE )             return null;
         } else if ( var.type == Type.SignedBinary ) {
-            if ( targetType == Type.Integer )               return twosToInt( var.val );
-            else if ( targetType == Type.Binary )           return intToBinary( Integer.parseInt( twosToInt( var.val ) ) );
-            else if ( targetType == Type.Hex )              return intToHex( Integer.parseInt( twosToInt( var.val ) ) );
+            if ( targetType == Type.Integer )               return Conversion.twosToInt( var.val );
+            else if ( targetType == Type.Double )           return "" + Double.parseDouble( Conversion.twosToInt( var.val ) );
+            else if ( targetType == Type.Binary )           return Conversion.intToBinary( Conversion.twosToInt( var.val ) );
+            else if ( targetType == Type.Hex )              return Conversion.intToHex( Conversion.twosToInt( var.val ) );
             else if ( targetType == Type.IEEE )             return null;
         } else if ( var.type == Type.IEEE ) {
-            if ( targetType == Type.Integer )               return null;
-            else if ( targetType == Type.Binary )           return null;
-            else if ( targetType == Type.SignedBinary )     return null;
-            else if ( targetType == Type.Hex )              return null;
+            if ( targetType == Type.Integer )               return Conversion.doubleToInt( Conversion.IEEEtoDouble( var.val ) );
+            else if ( targetType == Type.Double )           return Conversion.IEEEtoDouble( var.val );
+            else if ( targetType == Type.Binary )           return Conversion.intToBinary( Conversion.doubleToInt( Conversion.IEEEtoDouble( var.val ) ) );
+            else if ( targetType == Type.SignedBinary )     return Conversion.binToTwos( Conversion.intToBinary( Conversion.doubleToInt( Conversion.IEEEtoDouble( var.val ) ) ) );
+            else if ( targetType == Type.Hex )              return Conversion.intToHex( Conversion.doubleToInt( Conversion.IEEEtoDouble( var.val ) ) );
+        } else if ( var.type == Type.Double ) {
+            if ( targetType == Type.Integer )               return Conversion.doubleToInt(  var.val );
+            else if ( targetType == Type.Binary )           return Conversion.intToBinary( Conversion.doubleToInt( var.val ) );
+            else if ( targetType == Type.SignedBinary )     return (Integer.parseInt( var.val )  < 0 ) ? Conversion.intToBinary( Conversion.doubleToInt( var.val ) ) : Conversion.binToTwos( Conversion.intToBinary( Conversion.doubleToInt( var.val ) ) );
+            else if ( targetType == Type.Hex )              return Conversion.intToHex( Conversion.doubleToInt( var.val ) );
+            else if ( targetType == Type.IEEE )             return null;
         }
         return null;
     }
@@ -305,125 +316,5 @@ public class Number{
         System.out.println( "" );
     }
 
-    public static void initHexMap() {
-        hexMap.put( '0', "0000" );
-        hexMap.put( '1', "0001" );
-        hexMap.put( '2', "0010" );
-        hexMap.put( '3', "0011" );
-        hexMap.put( '4', "0100" );
-        hexMap.put( '5', "0101" );
-        hexMap.put( '6', "0110" );
-        hexMap.put( '7', "0111" );
-        hexMap.put( '8', "1000" );
-        hexMap.put( '9', "1001" );
-        hexMap.put( 'A', "1010" );
-        hexMap.put( 'B', "1011" );
-        hexMap.put( 'C', "1100" );
-        hexMap.put( 'D', "1101" );
-        hexMap.put( 'E', "1110" );
-        hexMap.put( 'F', "1111" );
-    }
-
-    public static String showCalcBin( String bin ) {
-        // Reverse:
-        String s = "";
-        for ( char c : bin.toCharArray() )
-            s = c + s;
-        bin = s;
-        // Compute the calc.
-        int power = 0;
-        String out = "";
-        for ( char c : bin.toCharArray() ) {
-            if ( c != ' ' ) {
-                if ( c == '1' ) {
-                    if ( power != 0 )
-                        out = out + " + ";
-                    out = out + "2^" + power;
-                }
-                ++power;
-            }
-        }
-        return out;
-    }
-
-    public static String binToTwos( String bin ) {
-        String out = "";
-        for ( char c : bin.toCharArray() ) {
-            if ( c != ' ' )
-                out = out + flipBit( c );
-            else 
-                out = out + " ";
-        }
-        // add one to it.
-        int i = out.length() -1;
-        while ( i >= 0 && out.charAt( i ) != '0' ) {
-            if ( out.charAt( i ) != ' ' )
-                out = replaceChar( out, '0', i );
-            --i;
-        }
-        
-        out = replaceChar( out, '1', i );
-        
-        return out;
-    }
-
-    public static String replaceChar( String s, char c, int i ) {
-        return s.substring( 0, i ) + c + s.substring( i + 1 );
-    }
-
-    public static char flipBit( char c ) {
-        return c == '0' ? '1' : '0';
-    }
-
-
-
-    public static String intToBinary( int n ) {
-        String bin = Integer.toBinaryString( n );
-        while ( bin.length() % 4 != 0 ) {
-            bin = "0" + bin;
-        }
-        if ( bin.length() > 4 ) {
-            String bCopy = bin;
-            bin = "";
-            for ( int i = 0; i < bCopy.length(); i = i + 4 )
-                bin = bin + bCopy.substring( i, i + 4 ) + " ";
-        }
-        return bin;
-    }
-
-    public static String intToHex( int num ) {
-        String hex = "0x" + Integer.toHexString( num ).toUpperCase();
-        return hex;        
-    }
-
-    public static String hexToBinary( String hex ) {
-        String out = "";
-        for ( Character c : hex.substring(2).toUpperCase().toCharArray() ) {
-            out += hexMap.get( c ) + " ";
-        }
-        return out;
-    }
-
-    public static String twosToInt( String twos ) {
-        int val = 0;
-        int power = 0;
-        for ( int i = twos.length()-1; i > 0; --i ) {
-            val = val + ( twos.charAt( i ) == '1'  ? (int) Math.pow( 2, power ) : 0);
-            power ++;
-        }
-        if ( twos.charAt(0) == '1' )
-            val = val - (int) Math.pow( 2, power );
-        
-        return "" + val;
-    }
-
-    public static String binToInt( String bin ) {
-        int val = 0;
-        int power = 0;
-        for ( int i = bin.length()-1; i >= 0; --i ) {
-            val = val + ( bin.charAt( i ) == '1'  ? (int) Math.pow( 2, power ) : 0);
-            power ++;
-        }
-        return "" + val;
-    }
+    
 }

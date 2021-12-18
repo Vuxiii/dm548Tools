@@ -17,13 +17,15 @@ public class TypeSelecter {
     public static Type get( int t ) {
         if ( t == 1 )
             return Type.Integer;
-        else if ( t == 2 ) 
-            return Type.Binary;
+        else if ( t == 2 )
+            return Type.Double;
         else if ( t == 3 ) 
+            return Type.Binary;
+        else if ( t == 4 ) 
             return Type.SignedBinary;
-        else if ( t == 4 )
-            return Type.Hex;
         else if ( t == 5 )
+            return Type.Hex;
+        else if ( t == 6 )
             return Type.IEEE;
         return null;
     }
@@ -33,9 +35,10 @@ public class TypeSelecter {
      */
     public static void printAll() {
         System.out.println( "1] Integer" );
-        System.out.println( "2] Binary" );
-        System.out.println( "3] Signed Binary" );
-        System.out.println( "4] Hex" );
-        System.out.println( "5] IEEE" );
+        System.out.println( "2] Double" );
+        System.out.println( "3] Binary" );
+        System.out.println( "4] Signed Binary" );
+        System.out.println( "5] Hex" );
+        System.out.println( "6] IEEE" );
     }
 }
