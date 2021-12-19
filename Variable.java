@@ -26,7 +26,7 @@ public class Variable {
                 s += val.substring( i, i + 2 ) + " ";
             s += val.charAt( val.length() - 1 );
         } else if ( type == Type.Hex )
-            s = "0x" + val.toUpperCase();
+            s += "0x" + val.toUpperCase();
         else if ( (type == Type.Binary || type == Type.SignedBinary) && val.length() > 4 ) {
             String newVal = "";
             for ( int i = val.length()-1; i >= 0; --i ) {

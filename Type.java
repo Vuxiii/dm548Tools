@@ -4,5 +4,5 @@ public enum Type {
     Binary,
     SignedBinary,
     Hex,
-    IEEE
+    IEEE,
 }

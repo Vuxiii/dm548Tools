@@ -33,14 +33,12 @@ public class Conversion {
         int power = 0;
         String out = "";
         for ( char c : bin.toCharArray() ) {
-            // if ( c != ' ' ) {
-                if ( c == '1' ) {
-                    if ( power != 0 )
-                        out = out + " + ";
-                    out = out + "2^" + power;
-                }
-                ++power;
-            // }
+            if ( c == '1' ) {
+                if ( power != 0 )
+                    out = out + " + ";
+                out = out + "2^" + power;
+            }
+            ++power;
         }
         return out;
     }
@@ -48,20 +46,16 @@ public class Conversion {
     public static String binToTwos( String bin ) {
         String out = "";
         for ( char c : bin.toCharArray() ) {
-            // if ( c != ' ' )
-                out = out + flipBit( c );
-            // else 
-            //     out = out + " ";
+            out = out + flipBit( c );
         }
         // add one to it.
         int i = out.length() -1;
         while ( i >= 0 && out.charAt( i ) != '0' ) {
-            // if ( out.charAt( i ) != ' ' )
-                out = replaceChar( out, '0', i );
+            out = replaceChar( out, '0', i );
             --i;
         }
-        
-        out = replaceChar( out, '1', i );
+        if ( i >= 0 )
+            out = replaceChar( out, '1', i );
         
         return out;
     }
@@ -92,13 +86,6 @@ public class Conversion {
 
         bin = Arit.binSignExtend( bin, size, val < 0 );
 
-        
-        // if ( bin.length() > 4 ) {
-        //     String bCopy = bin;
-        //     bin = "";
-        //     for ( int i = 0; i < bCopy.length(); i = i + 4 )
-        //         bin = bin + bCopy.substring( i, i + 4 ) + " ";
-        // }
         return bin;
     }
 
@@ -144,26 +131,127 @@ public class Conversion {
 
     public static String doubleToIEEE( String dou ) {
         double val = Double.parseDouble( dou );
+
+        // Find the sign.
         int sign = ( val < 0 ) ? -1 : 1;
-        String significand = "";
+        
         if ( sign == -1 )
             dou = dou.substring( 1 );
+        if ( val < 0 ) val = val * -1;
+
+        String significandG = doubleToIEEEUpper( dou );
         
-        return significand;
+        String significandL = doubleToIEEELower( dou );
+
+        // Find biased exponent
+        Integer biasedExpG = null;
+        // Search through significandG first.
+        for ( int i = 0; i < significandG.length(); ++i ) {
+            if ( significandG.charAt(i) == '1' ) {
+                biasedExpG = significandG.length() - (i + 1); 
+                break;
+            }
+        }
+
+        Integer biasedExpL = null;
+        // Search through significandL if no possible exponent were found.
+        for ( int i = 0; i < significandL.length(); ++i ) {
+            if ( significandL.charAt(i) == '1' ) {
+                biasedExpL = -(i + 1); 
+                break;
+            }
+        }
+
+        if ( biasedExpG != null )
+            significandG = significandG.substring( significandG.length() - biasedExpG  );
+        while ( significandG.length() != 23 ) significandG += "0";
+        if ( biasedExpL != null )
+            significandL = significandL.substring( Math.abs( biasedExpL ) );
+        while ( significandL.length() != 23 ) significandL += "0";
+
+        String exponentG = biasedExpG == null ? "00000000" : Arit.binSignExtend(intToBinary( "" + (biasedExpG + 127) ), 8, false);
+        String exponentL = biasedExpL == null ? "00000000" : Arit.binSignExtend(intToBinary( "" + (biasedExpL + 127) ), 8, false);
+        
+        System.out.println( );
+        
+        String ieeeG = "0" + exponentG + significandG;
+        String ieeeL = "0" + exponentL + significandL;
+        System.out.println( "Greater");
+        System.out.println( ieeeG );
+        System.out.println( "Lower");
+        System.out.println( ieeeL );
+        
+        String combined = Arit.IEEEaddv2( new Variable( "", ieeeG, Type.IEEE ), new Variable( "", ieeeL, Type.IEEE ) );
+        
+        return (sign == -1 ? "1" : "0") + combined.substring( 1 );
         
     }
+
+    private static String doubleToIEEEUpper( String upper ) {
+        double val = Double.parseDouble( upper );
+        // Find the significand for the value > 0
+        int power = 0;
+        while ( Math.pow( 2, power ) <= Math.abs( val ) ) power++;
+        String significandG = "0".repeat( power );
+        {
+            int currentBit = 0;
+            while ( power != 0 ) {
+                String intVal = binToInt( replaceChar( significandG, flipBit( significandG.charAt(currentBit) ), currentBit ) );
+
+                if ( Integer.parseInt( intVal ) <= (int) val )
+                    significandG = replaceChar( significandG, '1', currentBit );
+                else
+                significandG = replaceChar( significandG, '0', currentBit );
+                --power;
+                ++currentBit;
+            }
+        }
+        return significandG;
+    }
+
+    private static String doubleToIEEELower( String lower ) {
+        double val = Double.parseDouble( lower );
+        // Find the significand for the value < 0
+        String significandL = "";
+        
+        lower = "" + (val - (int) val);
+        System.out.println( "Lower is actually\t" + lower );
+        int usedBits = 0;
+        double current = Double.parseDouble( lower );
+        System.out.println( current );
+        while ( usedBits != 23 ) {
+            // System.out.print( current + " * 2 = " );
+            current = current * 2.0;
+            // System.out.println( current );
+            if ( current >= 1 )
+                significandL += "1";
+            else 
+                significandL += "0";
+            if ( current >= 1.0 ) current = current - 1.0;
+            ++usedBits;
+            System.out.println( significandL );
+        }
+        return significandL;
+        
+    }
+
 
     public static String IEEEtoDouble( String IEEE ) {
         int sign = IEEE.charAt( 0 ) == '0' ? 1 : -1;
         int exponent = Integer.parseInt( binToInt( IEEE.substring( 1, 9 ) ) );
         int biasedExp = exponent - 127;
-        double significand = 1.0;
+        Fraction significand = new Fraction( 1, 1 );
         String sig = IEEE.substring( 9 );
         for ( int i = 0; i < sig.length(); i++ ) {
-            if ( sig.charAt( i ) == '1' )
-                significand += Math.pow( 2, -(i + 1) );
+            if ( sig.charAt( i ) == '1' ) {
+                significand = significand.add( new Fraction( 1, (int) Math.pow(2, i+1 ) ) );
+                // System.out.println( "Adding new Frac " + new Fraction( 1, (int) Math.pow(2, i+1 ) ).toString() );
+            }
         }
-        double ret = sign * Math.pow(2, biasedExp) * significand;
+
+        // System.out.println( binToInt( IEEE.substring( 1, 9 ) ) );
+        // System.out.println( significand.value() );
+        double ret = sign * Math.pow(2, biasedExp) * significand.value();
         return "" + ret;
     }
 }
