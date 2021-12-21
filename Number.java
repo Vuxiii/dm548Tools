@@ -14,8 +14,10 @@ public class Number{
     public static void main( String[] args ) {
 
         // System.out.println( Conversion.doubleToIEEE( "-720" ) );
-
-        // /**
+        String dou = "0.1";
+        System.out.println( Conversion.doubleToIEEEv2( "0.645" ) );
+        System.out.println( Conversion.IEEEtoDouble( Conversion.doubleToIEEEv2( "0.645" ) ) );
+        /**
         
         Conversion.initHexMap();
         int choice = -1;
@@ -58,7 +60,7 @@ public class Number{
                 in.nextLine();
             }
         } while ( choice != 0 );
-        //  */
+         */
         in.close();
     }
     
@@ -342,25 +344,25 @@ public class Number{
             else if ( targetType == Type.Binary )           return Conversion.intToBinary( var.val  );
             else if ( targetType == Type.SignedBinary )     return (Integer.parseInt( var.val )  < 0 ) ? Conversion.intToBinary( var.val  ) : Conversion.binToTwos( Conversion.intToBinary( var.val  ) );
             else if ( targetType == Type.Hex )              return Conversion.intToHex( var.val  );
-            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEE( "" + Double.parseDouble( var.val ) );
+            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEEv2( "" + Double.parseDouble( var.val ) );
         } else if ( var.type == Type.Hex ) {
             if ( targetType == Type.Integer )               return "" + Long.parseLong( var.val, 16 );
             else if ( targetType == Type.Double )           return "" + Double.parseDouble( "" + Long.parseLong( var.val, 16 ) );
             else if ( targetType == Type.Binary )           return Conversion.hexToBinary( var.val );
             else if ( targetType == Type.SignedBinary )     return Conversion.binToTwos( Conversion.hexToBinary( var.val ) );
-            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEE( "" + Double.parseDouble( Conversion.binToInt( Conversion.hexToBinary( var.val ) ) ) );
+            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEEv2( "" + Double.parseDouble( Conversion.binToInt( Conversion.hexToBinary( var.val ) ) ) );
         } else if ( var.type == Type.Binary ) {
             if ( targetType == Type.Integer )               return Conversion.binToInt( var.val );
             else if ( targetType == Type.Double )           return "" + Double.parseDouble( Conversion.binToInt( var.val ) );
             else if ( targetType == Type.SignedBinary )     return Conversion.binToTwos( var.val );
             else if ( targetType == Type.Hex )              return Conversion.intToHex( Conversion.binToInt( var.val ) );
-            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEE( "" + Double.parseDouble( Conversion.binToInt( var.val ) ) );
+            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEEv2( "" + Double.parseDouble( Conversion.binToInt( var.val ) ) );
         } else if ( var.type == Type.SignedBinary ) {
             if ( targetType == Type.Integer )               return Conversion.twosToInt( var.val );
             else if ( targetType == Type.Double )           return "" + Double.parseDouble( Conversion.twosToInt( var.val ) );
             else if ( targetType == Type.Binary )           return Conversion.intToBinary( Conversion.twosToInt( var.val ) );
             else if ( targetType == Type.Hex )              return Conversion.intToHex( Conversion.twosToInt( var.val ) );
-            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEE( "" + Double.parseDouble( Conversion.twosToInt( var.val ) ) );
+            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEEv2( "" + Double.parseDouble( Conversion.twosToInt( var.val ) ) );
         } else if ( var.type == Type.IEEE ) {
             if ( targetType == Type.Integer )               return Conversion.doubleToInt( Conversion.IEEEtoDouble( var.val ) );
             else if ( targetType == Type.Double )           return Conversion.IEEEtoDouble( var.val );
@@ -372,7 +374,7 @@ public class Number{
             else if ( targetType == Type.Binary )           return Conversion.intToBinary( Conversion.doubleToInt( var.val ) );
             else if ( targetType == Type.SignedBinary )     return (Integer.parseInt( var.val )  < 0 ) ? Conversion.intToBinary( Conversion.doubleToInt( var.val ) ) : Conversion.binToTwos( Conversion.intToBinary( Conversion.doubleToInt( var.val ) ) );
             else if ( targetType == Type.Hex )              return Conversion.intToHex( Conversion.doubleToInt( var.val ) );
-            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEE( var.val );
+            else if ( targetType == Type.IEEE )             return Conversion.doubleToIEEEv2( var.val );
         }
         return null;
     }
