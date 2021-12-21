@@ -14,9 +14,13 @@ public class Number{
     public static void main( String[] args ) {
 
         // System.out.println( Conversion.doubleToIEEE( "-720" ) );
-        String dou = "0.1";
-        System.out.println( Conversion.doubleToIEEEv2( "0.645" ) );
-        System.out.println( Conversion.IEEEtoDouble( Conversion.doubleToIEEEv2( "0.645" ) ) );
+        
+        Variable varX = new Variable( "X", Conversion.doubleToIEEEv2( "0.645" ), Type.IEEE );
+        Variable varY = new Variable( "X", Conversion.doubleToIEEEv2( "9.0" ), Type.IEEE );
+        String out = Arit.IEEEaddv2(varX, varY);
+        System.out.println( out );
+        System.out.println( Conversion.IEEEtoDouble( out ));
+        
         /**
         
         Conversion.initHexMap();
