@@ -162,6 +162,88 @@ public class Arit {
         return bin;
     }
 
+
+    public static String IEEEaddv3( Variable varX, Variable varY ) {
+
+        // Check for one of the two's being 0
+        if ( !varX.val.contains( "1" ) ) return varY.val;
+        if ( !varY.val.contains( "1" ) ) return varX.val;
+
+
+        // Step one. Align exponents & significand.
+        String[] vars = IEEEalignExponents( varX, varY );
+        if ( vars[1] == null ) return vars[0]; 
+        String Z_exponent = vars[0].substring(0, 8);
+
+        // Step two. Add significands.
+        // adding the sign bit to the front. Making them twos complement.
+        String correctXSig = varX.val.charAt(0) == '1' ? Conversion.binToTwos( "0" + vars[0].substring(8) ) : "0" + vars[0].substring(8);
+        String correctYSig = varY.val.charAt(0) == '1' ? Conversion.binToTwos( "0" + vars[1].substring(8) ) : "0" + vars[1].substring(8);
+
+        Variable X = new Variable( "X", correctXSig, Type.SignedBinary );
+        Variable Y = new Variable( "Y", correctYSig, Type.SignedBinary );
+        BinaryResult rs = binAdd( X, Y );
+        String Z_sign = rs.val.charAt(0) + "";
+        
+        String Z_significand = rs.val.substring( 1 );
+        
+        // Overflow?
+        if ( rs.overflow == OverUnderFlow.Overflow ) {
+            IEEEshiftSignificand( Z_significand, true );
+            BinaryResult ts = IEEEincrementExponent( Z_exponent, 1 );
+            if ( ts.overflow == OverUnderFlow.Overflow ) return "EXPONENT_OVERFLOW";
+        }
+
+        // Step three. Normalize the significand.
+        while ( !Z_significand.startsWith( "1" ) ) {
+            
+            Z_significand = IEEEshiftSignificand( Z_significand, false );
+            BinaryResult ts = IEEEincrementExponent( Z_exponent, -1 );
+            Z_exponent = ts.val;
+
+            if ( ts.overflow == OverUnderFlow.Underflow ) return "EXPONENT_UNDERFLOW";
+        }
+        // System.out.println( "Sign\t" + Z_sign );
+        // System.out.println( "Exp\t" + Z_exponent );
+        // System.out.println( "Sign\t" + Z_significand );
+        return Z_sign + Z_exponent + Z_significand.substring(1);
+
+    }
+
+    /**
+     * This method aligns the two given IEEE's exponents, shifting the corresponding significand.
+     * This method adds the leading "1" to the significands.
+     * The first 8 bits are the exponents, the remaining is the significand.
+     * @param X
+     * @param Y
+     * @return corrected X and corrected Y in that order.
+     */
+    public static String[] IEEEalignExponents( Variable X, Variable Y ) {
+        String X_exponent = X.val.substring( 1, 9 );
+        String Y_exponent = Y.val.substring( 1, 9 );
+        String X_significand = "1" + X.val.substring( 9 );
+        String Y_significand = "1" + Y.val.substring( 9 );
+        
+        if ( Integer.parseInt( Conversion.binToInt( X_exponent ) ) < Integer.parseInt( Conversion.binToInt( Y_exponent ) ) ) {
+            // Increase x exponent
+            // Decrease x significand
+            while ( !X_exponent.equals( Y_exponent ) ) {
+                X_exponent = IEEEincrementExponent( X_exponent, 1 ).val;
+                X_significand = IEEEshiftSignificand( X_significand, true );
+                if ( !X_significand.contains( "1" ) ) return new String[] { Y.val, null };
+            }
+        } else if ( Integer.parseInt( Conversion.binToInt( X_exponent ) ) > Integer.parseInt( Conversion.binToInt( Y_exponent ) ) ) {
+            // Increase y exponent
+            // Decrease y significand
+            while ( !Y_exponent.equals( X_exponent ) ) {
+                Y_exponent = IEEEincrementExponent( Y_exponent, 1 ).val;
+                Y_significand = IEEEshiftSignificand( Y_significand, true );
+                if ( !Y_significand.contains( "1" ) ) return new String[] { X.val, null };
+            }
+        }
+        return new String[] { X_exponent + X_significand, Y_exponent + Y_significand };
+    } 
+
     public static String IEEEaddv2( Variable varX, Variable varY ) {
         System.out.println( "IEEEv2");
         System.out.println( varX.val );

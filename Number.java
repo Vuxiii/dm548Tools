@@ -15,9 +15,11 @@ public class Number{
 
         // System.out.println( Conversion.doubleToIEEE( "-720" ) );
         
-        Variable varX = new Variable( "X", Conversion.doubleToIEEEv2( "0.645" ), Type.IEEE );
+        Variable varX = new Variable( "X", Conversion.doubleToIEEEv2( "-0.645" ), Type.IEEE );
         Variable varY = new Variable( "X", Conversion.doubleToIEEEv2( "9.0" ), Type.IEEE );
-        String out = Arit.IEEEaddv2(varX, varY);
+        String out = Arit.IEEEaddv3(varX, varY);
+        System.out.println( varX.val );
+        System.out.println( varY.val );
         System.out.println( out );
         System.out.println( Conversion.IEEEtoDouble( out ));
         

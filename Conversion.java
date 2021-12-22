@@ -141,10 +141,10 @@ public class Conversion {
 
         String significand = IEEEconstructSignificand( integerPart, decimalPart, exponent );
         
-        System.out.println( "Integerpart\t" + integerPart );
-        System.out.println( "Decimalpart\t" + decimalPart );
-        System.out.println( "Significand\t" + significand );
-        System.out.println( "Exponent\t" + exponent );
+        // System.out.println( "Integerpart\t" + integerPart );
+        // System.out.println( "Decimalpart\t" + decimalPart );
+        // System.out.println( "Significand\t" + significand );
+        // System.out.println( "Exponent\t" + exponent );
         return (sign + exponent + significand).substring(0, 32);
     }
 
